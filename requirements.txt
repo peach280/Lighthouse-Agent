@@ -4,3 +4,4 @@ groq
 pydantic
 pathlib
 python-dotenv
+fastapi-mcp

@@ -49,7 +49,21 @@ async def fix(request: FixRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+import os
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional, List
+import tools
+from fastapi_mcp import FastApiMCP          # ← ADD
+
+app = FastAPI(title="Siemens Lighthouse Architect API")
+
+# ... your existing AuditRequest, FixRequest, /analyze, /fix, /meta routes stay exactly as-is ...
+
+# ── MCP mount (add these 3 lines at the bottom, before uvicorn.run) ──
+mcp = FastApiMCP(app, name="Lighthouse Architect")
+mcp.mount()                                # ← exposes /mcp endpoint
+
 if __name__ == "__main__":
     import uvicorn
-    # Run on port 8000
     uvicorn.run(app, host="0.0.0.0", port=8000)
