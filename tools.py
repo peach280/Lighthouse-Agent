@@ -13,6 +13,7 @@ that string .replace() calls would silently mangle.
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -32,37 +33,23 @@ GROQ_MODEL = "llama-3.3-70b-versatile"  # fast + strong enough for code fixes
 
 # ─────────────────────────────────────────────
 # 1.  run_audit
-# ─────────────────────────────────────────────
+# ────────────────────────────────────────────
 
 def run_audit(
     file_path: str,
     categories: Optional[list[str]] = None,
     locale: str = "en",
 ) -> dict:
-    """
-    Run Lighthouse CLI against a local HTML file.
-    Returns the raw Lighthouse Result (LHR) as a Python dict.
+    _URL_RE = re.compile(r'^https?://', re.IGNORECASE)
+    is_url = bool(_URL_RE.match(file_path))
 
-    Parameters
-    ----------
-    file_path : str
-        Absolute or workspace-relative path to the HTML file.
-    categories : list[str] | None
-        Subset of ["performance", "accessibility", "seo", "best-practices"].
-        Defaults to all four if None.
-    locale : str
-        Locale string passed to Lighthouse (default "en").
-
-    Raises
-    ------
-    FileNotFoundError  - file_path does not exist
-    RuntimeError       - Lighthouse CLI exits non-zero
-    """
-    path = Path(file_path).resolve()
-    if not path.exists():
-        raise FileNotFoundError(f"File not found: {path}")
-
-    url = path.as_uri()
+    if is_url:
+        url = file_path
+    else:
+        path = Path(file_path).resolve()
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {path}")
+        url = path.as_uri()
 
     if categories is None:
         categories = ["performance", "accessibility", "seo", "best-practices"]
@@ -77,13 +64,15 @@ def run_audit(
         f"--output-path={output_path}",
         f"--only-categories={','.join(categories)}",
         f"--locale={locale}",
-        # Required for file:// URLs and CI/container environments.
-        # --no-sandbox: needed inside Docker/most CI runners.
-        # --disable-gpu: prevents hangs in headless Linux environments.
         "--chrome-flags=--headless --no-sandbox --disable-gpu",
         "--quiet",
         "--no-enable-error-reporting",
     ]
+
+    # For http:// targets, Lighthouse needs a real browser profile
+    # (file:// works headless, but localhost URLs need --disable-dev-shm-usage)
+    if is_url:
+        cmd[-3] = "--chrome-flags=--headless --no-sandbox --disable-gpu --disable-dev-shm-usage"
 
     result = subprocess.run(cmd, capture_output=True, text=True)
 
@@ -430,12 +419,12 @@ def suggest_fix(
     Returns
     -------
     dict:
-        audit_id    – resolved canonical ID
-        before      – original snippet (unchanged)
-        after       – fixed snippet (may equal before if fix is manual-only)
-        explanation – why the fix works, specific to this snippet
-        caveat      – what the developer must verify manually (empty if none)
-        model       – Groq model that produced the fix
+        audit_id    - resolved canonical ID
+        before      - original snippet (unchanged)
+        after       - fixed snippet (may equal before if fix is manual-only)
+        explanation - why the fix works, specific to this snippet
+        caveat      - what the developer must verify manually (empty if none)
+        model       - Groq model that produced the fix
     """
     resolved_id = _AUDIT_ALIASES.get(audit_id.lower(), audit_id.lower())
     system_prompt, user_prompt = _build_prompts(resolved_id, code_snippet, context)

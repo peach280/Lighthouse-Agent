@@ -1,14 +1,37 @@
 import os
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import Optional, List
-import tools  # Your Agentic tools.py
+from pydantic import BaseModel, Field
+from typing import Optional, List,Literal
+import tools  
+from fastapi_mcp import FastApiMCP  
 
 app = FastAPI(title="Siemens Lighthouse Architect API")
 
+
 class AuditRequest(BaseModel):
-    target: str # Can be file path or localhost URL
-    categories: Optional[List[str]] = None
+    target: str = Field(
+        description="URL (http://localhost:3000) or absolute path to an HTML file"
+    )
+    categories: List[Literal["performance", "accessibility", "seo", "best-practices"]] = Field(
+        default=["performance", "accessibility", "seo", "best-practices"],
+        description="Lighthouse categories to audit",
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {                          # ← this is the exact fix
+                        "type": "string",
+                        "enum": ["performance", "accessibility", "seo", "best-practices"]
+                    },
+                    "default": ["performance", "accessibility", "seo", "best-practices"],
+                    "description": "Lighthouse categories to audit"
+                }
+            }
+        }
+    }
 
 class FixRequest(BaseModel):
     audit_id: str
@@ -16,7 +39,7 @@ class FixRequest(BaseModel):
     context: Optional[str] = "Siemens Healthineers UI, React/JSX"
 
 @app.post("/analyze")
-async def analyze(request: AuditRequest):
+async def mcp_analyze_lighthouse(request: AuditRequest):
     try:
         # The tool now handles URL vs File internally
         summary = tools.analyze_lighthouse(request.target, request.categories)
@@ -37,7 +60,7 @@ async def get_meta():
     }
 
 @app.post("/fix")
-async def fix(request: FixRequest):
+async def mcp_suggest_fix(request: FixRequest):
     try:
         # Use the Agentic Groq-powered logic
         fix_result = tools.suggest_fix(
@@ -49,20 +72,13 @@ async def fix(request: FixRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-import os
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import Optional, List
-import tools
-from fastapi_mcp import FastApiMCP          # ← ADD
 
-app = FastAPI(title="Siemens Lighthouse Architect API")
+@app.get("/mcp")
+async def mcp_handshake():
+    return {"status": "ok", "message": "MCP Server is running"}
 
-# ... your existing AuditRequest, FixRequest, /analyze, /fix, /meta routes stay exactly as-is ...
-
-# ── MCP mount (add these 3 lines at the bottom, before uvicorn.run) ──
 mcp = FastApiMCP(app, name="Lighthouse Architect")
-mcp.mount()                                # ← exposes /mcp endpoint
+mcp.mount()                                
 
 if __name__ == "__main__":
     import uvicorn
