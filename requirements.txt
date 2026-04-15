@@ -1,7 +1,7 @@
 fastapi
 uvicorn
-groq
 pydantic
 pathlib
 python-dotenv
 fastapi-mcp
+pip-system-certs
