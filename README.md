@@ -83,6 +83,7 @@ That's it. The script handles everything automatically:
 | Opens VS Code | Opens the project folder automatically |
 
 You will see this when everything is ready:
+
 <img width="1048" height="484" alt="Screenshot 2026-05-08 073023" src="https://github.com/user-attachments/assets/3ebc245b-c12c-4519-b6f5-e9779c02e786" />
 
 
@@ -112,6 +113,7 @@ Lighthouse-Agent/
 ```
 
 Start your frontend dev server (e.g. `npm run dev`) so it's running on a local port before auditing.
+
 <img width="1620" height="530" alt="Screenshot 2026-05-08 073122" src="https://github.com/user-attachments/assets/ff1feaf3-bdab-488a-809d-d9a3952ccf56" />
 
 
@@ -157,6 +159,7 @@ Replace the URL with whatever port your frontend runs on.
 - Fix suggestions are generated automatically using the knowledge base
 
 <img width="384" height="654" alt="Screenshot 2026-05-08 073214" src="https://github.com/user-attachments/assets/4b808232-96fa-403e-9ba4-b87b18b9d19a" />
+
 
 <img width="1548" height="598" alt="Screenshot 2026-05-08 073243" src="https://github.com/user-attachments/assets/96b69c20-4c3b-4792-9511-ca21869c889b" />
 
