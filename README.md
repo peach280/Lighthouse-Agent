@@ -48,6 +48,7 @@ You should see `Python 3.10.x` or higher.
 
 After extracting the ZIP, ensure the folder structure looks like this:
 
+
 ```
 Lighthouse-Agent/
 ├── start.bat
@@ -67,6 +68,9 @@ Lighthouse-Agent/
 
 That's it. The script handles everything automatically:
 
+<img width="1076" height="473" alt="Screenshot 2026-05-08 072951" src="https://github.com/user-attachments/assets/24c11aaf-13eb-46c4-8116-5a86fde87e93" />
+
+
 | Step | What happens |
 |------|-------------|
 | Checks Node.js | Errors with a download link if missing |
@@ -79,6 +83,8 @@ That's it. The script handles everything automatically:
 | Opens VS Code | Opens the project folder automatically |
 
 You will see this when everything is ready:
+<img width="1048" height="484" alt="Screenshot 2026-05-08 073023" src="https://github.com/user-attachments/assets/3ebc245b-c12c-4519-b6f5-e9779c02e786" />
+
 
 ```
 =========================================
@@ -106,6 +112,8 @@ Lighthouse-Agent/
 ```
 
 Start your frontend dev server (e.g. `npm run dev`) so it's running on a local port before auditing.
+<img width="1620" height="530" alt="Screenshot 2026-05-08 073122" src="https://github.com/user-attachments/assets/ff1feaf3-bdab-488a-809d-d9a3952ccf56" />
+
 
 ---
 
@@ -116,6 +124,9 @@ Once VS Code opens, confirm that Copilot has picked up the MCP server:
 1. Press `Ctrl + Shift + P` to open the Command Palette
 2. Type `MCP: List Servers` and press Enter
 3. You should see `lighthouse-architect` in the list with a **green dot** and status `Running`
+
+
+
 
 ```
 MCP Servers
@@ -135,6 +146,8 @@ In VS Code's Copilot Chat, run:
 
 Replace the URL with whatever port your frontend runs on.
 
+<img width="568" height="730" alt="Screenshot 2026-05-08 073151" src="https://github.com/user-attachments/assets/9b07ab1a-a640-4029-9762-b250a1979b3b" />
+
 ---
 
 ## What happens next
@@ -142,6 +155,11 @@ Replace the URL with whatever port your frontend runs on.
 - Lighthouse audit runs via the MCP server
 - Failures are detected across Performance, Accessibility, SEO, and Best Practices
 - Fix suggestions are generated automatically using the knowledge base
+
+<img width="384" height="654" alt="Screenshot 2026-05-08 073214" src="https://github.com/user-attachments/assets/4b808232-96fa-403e-9ba4-b87b18b9d19a" />
+
+<img width="1548" height="598" alt="Screenshot 2026-05-08 073243" src="https://github.com/user-attachments/assets/96b69c20-4c3b-4792-9511-ca21869c889b" />
+
 
 ---
 
